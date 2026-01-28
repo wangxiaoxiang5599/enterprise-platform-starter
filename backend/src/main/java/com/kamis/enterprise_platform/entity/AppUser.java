@@ -22,4 +22,12 @@ public class AppUser {
 
     @Column(nullable=false)
     private String status;
+
+    @Column(name="dept_id")
+    private Long deptId;
+
+    @Column(name="display_name")
+    private String displayName;
+
+    private String email;
 }

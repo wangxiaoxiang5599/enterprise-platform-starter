@@ -1,9 +1,11 @@
 package com.kamis.enterprise_platform.auth;
 
+import com.kamis.enterprise_platform.common.api.BizException;
 import com.kamis.enterprise_platform.entity.AppUser;
 import com.kamis.enterprise_platform.repository.AppUserRepository;
 import com.kamis.enterprise_platform.security.jwt.JwtUtil;
 import com.kamis.enterprise_platform.tenant.TenantContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +22,19 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest req) {
-        Long tenantId = TenantContext.get(); // 目前先用 header/default，下一步我们会改成更严谨
+        Long tenantId = TenantContext.get();
 
         AppUser user = userRepo.findByUsernameAndTenantId(req.getUsername(), tenantId)
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                .orElseThrow(() ->
+                        new BizException("AUTH_FAILED", "Invalid username or password", HttpStatus.UNAUTHORIZED)
+                );
 
         if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
-            throw new RuntimeException("User is not active");
+            throw new BizException("USER_DISABLED", "User is not active", HttpStatus.FORBIDDEN);
         }
 
         if (!encoder.matches(req.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new BizException("AUTH_FAILED", "Invalid username or password", HttpStatus.UNAUTHORIZED);
         }
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getTenantId(), user.getId());
