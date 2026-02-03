@@ -12,6 +12,7 @@ import com.kamis.enterprise_platform.repository.PermissionRepository;
 import com.kamis.enterprise_platform.repository.RolePermissionRepository;
 import com.kamis.enterprise_platform.repository.RoleRepository;
 import com.kamis.enterprise_platform.tenant.TenantContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

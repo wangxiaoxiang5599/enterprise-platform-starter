@@ -29,10 +29,10 @@ where p.code in ('user:read','user:create','user:update','user:delete')
     on conflict do nothing;
 
 -- 6) admin user
--- password: Admin@123  (BCrypt)
+-- password: Admin@1234  (BCrypt)
 insert into app_user (id, tenant_id, dept_id, username, password_hash, display_name, status)
 values (1, 1, 1, 'admin',
-        '$2a$10$1o9T1P4R4m7Pqz8g2IhG6u7mB4o3YQ0h0G8E9j1bVh2c3sQp1yQhS',
+        '$2a$10$txNgNLJBPjTij7Z5ZvD5v.mEAgqG2Z9dAKMLOWUnIK9WSMam8SDdK',
         'Admin', 'ACTIVE')
     on conflict (tenant_id, username) do nothing;
 
@@ -40,3 +40,9 @@ values (1, 1, 1, 'admin',
 insert into user_role (user_id, role_id)
 values (1, 1)
     on conflict do nothing;
+
+select setval(pg_get_serial_sequence('tenant','id'), (select coalesce(max(id), 0) from tenant));
+select setval(pg_get_serial_sequence('dept','id'), (select coalesce(max(id), 0) from dept));
+select setval(pg_get_serial_sequence('role','id'), (select coalesce(max(id), 0) from role));
+select setval(pg_get_serial_sequence('permission','id'), (select coalesce(max(id), 0) from permission));
+select setval(pg_get_serial_sequence('app_user','id'), (select coalesce(max(id), 0) from app_user));
