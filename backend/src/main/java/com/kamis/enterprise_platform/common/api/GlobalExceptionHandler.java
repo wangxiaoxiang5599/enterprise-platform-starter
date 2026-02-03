@@ -38,6 +38,7 @@ public class GlobalExceptionHandler {
     // 未登录（认证失败）
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse<Void>> handleAuth(AuthenticationException e) {
+        log.error("Unhandled exception", e);
         return ResponseEntity.status(401)
                 .body(ApiResponse.fail("UNAUTHORIZED", "Unauthorized", traceId()));
     }
